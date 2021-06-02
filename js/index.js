@@ -3,26 +3,25 @@ const submissionForm = document.getElementById('create-monster');
 const monsterContainer = document.getElementById('monster-container');
 const forwardButton = document.getElementById('forward');
 const backButton = document.getElementById('back');
+let pageNumber = 1;
 
-//variable for API
-const monstersAPI = 'http://localhost:3000/monsters/?_limit=50&_page=1';
 
 
 //fetch request
 function getMonsters() {
-    return fetch(monstersAPI)
+    monsterContainer.innerHTML = '';
+    return fetch(`http://localhost:3000/monsters/?_limit=50&_page=${pageNumber}`)
     .then(res => res.json())
-    .then(data => displayData(data))
+    .then(data => {
+        console.log(data);
+        data.map(element => displayData(element))
+    })
     .catch(error => console.log(error))
 }
 
 //function to display data
-function displayData(data) {
+function displayData(element) {
         //create div for each monster element w id = id#
-        if (typeof data === 'object') {
-            console.log('we got an object')
-        } else {
-            return data.map(element => {
             const newDiv = document.createElement('div');
             //create H2 for name & set innerText
             const name = document.createElement('h2');
@@ -36,9 +35,7 @@ function displayData(data) {
             //append to div
             newDiv.append(name, age, desc);
             monsterContainer.append(newDiv);
-        })
-            
-        }}
+}
 getMonsters();
 
 //assign form HTML tags to variables
@@ -72,4 +69,32 @@ function createMonster(e) {
     .then(data => displayData(data))
     .catch(error => console.log(error))
 }
+
+//function to increment page number
+function forward() {
+    pageNumber++;
+    console.log(pageNumber);
+}
+
+//function to load next 50 monters
+function next50Monsters() {
+    forward();
+    getMonsters();
+}
+//eventListener
+forwardButton.addEventListener('click', next50Monsters);
+
+//function to decrease page number
+function decrease() {
+    if (pageNumber > 1) {
+        pageNumber--;
+    }
+};
+
+function last50Monsters() {
+    decrease();
+    getMonsters();
+}
+
+backButton.addEventListener('click', last50Monsters)
 
